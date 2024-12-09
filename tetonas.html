@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tetonas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        /* Estilos generales */
+        :root {
+            --primary-color: #00ffff;
+            --secondary-color: #ff00ff;
+            --background-color: #111;
+            --card-background: #222;
+            --text-color: #fff;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar {
+            background-color: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: 2000;
+        }
+
+        .navbar-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0.8rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            transition: transform 0.3s ease;
+        }
+
+        .navbar-brand:hover {
+            transform: scale(1.05);
+        }
+
+        .navbar-links {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .navbar-links a {
+            position: relative;
+            padding: 0.5rem 0;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+            color: var(--text-color);
+            text-decoration: none;
+        }
+
+        .navbar-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            transition: width 0.3s ease;
+        }
+
+        .navbar-links a:hover::after {
+            width: 100%;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 1rem;
+            margin-top: 80px;
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+        }
+
+        /* Estilos actualizados para 6 imágenes por fila */
+        .gallery-container {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr); /* 6 columnas exactamente iguales */
+            gap: 10px; /* Espaciado reducido para que quepan más imágenes */
+            margin-top: 2rem;
+            padding: 0 20px;
+        }
+
+        .gallery-item {
+            position: relative;
+            width: 100%;
+            height: 450px; /* Altura reducida para mantener buena proporción */
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+            background-color: var(--card-background);
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Estilos para el lightbox */
+        .lightbox {
+            display: none;
+            position: fixed;
+            z-index: 2001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: rgba(0, 0, 0, 0.95);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .lightbox-content {
+            max-width: 90%;
+            max-height: 90vh;
+            object-fit: contain;
+            margin: auto;
+            display: block;
+            transition: transform 0.3s ease;
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: 15px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 2002;
+        }
+
+        .lightbox-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #fff;
+            font-size: 30px;
+            cursor: pointer;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .lightbox-prev {
+            left: 20px;
+        }
+
+        .lightbox-next {
+            right: 20px;
+        }
+
+        .lightbox-nav:hover {
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        footer {
+            text-align: center;
+            padding: 1rem;
+            background-color: rgba(0, 0, 0, 0.8);
+            margin-top: 2rem;
+        }
+
+        /* Estilos actualizados para la galería de videos */
+        .video-container {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+            margin-top: 2rem;
+            padding: 0 20px;
+        }
+
+        .video-item {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+            background-color: var(--card-background);
+        }
+
+        .video-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .video-item video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Estilo para el reproductor de video en el lightbox */
+        .lightbox-video {
+            max-width: 90%;
+            max-height: 90vh;
+        }
+
+        /* Ajustes responsive */
+        @media (max-width: 1600px) {
+            .gallery-container,
+            .video-container {
+                grid-template-columns: repeat(5, 1fr);
+            }
+        }
+
+        @media (max-width: 1400px) {
+            .gallery-container,
+            .video-container {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .gallery-container,
+            .video-container {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .gallery-container,
+            .video-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .gallery-container,
+            .video-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .gallery-item,
+            .video-item {
+                height: 400px;
+            }
+        }
+
+        /* Menú hamburguesa */
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+            cursor: pointer;
+            padding: 5px;
+            z-index: 2001;
+        }
+
+        .menu-toggle span {
+            width: 25px;
+            height: 2px;
+            background-color: var(--primary-color);
+            transition: all 0.3s ease;
+        }
+
+        /* Estilos responsive */
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: flex;
+            }
+
+            .navbar-links {
+                position: fixed;
+                top: 60px; /* Altura del navbar */
+                left: 0;
+                right: 0;
+                background: rgba(0, 0, 0, 0.95);
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+                transform: translateY(-200%);
+                opacity: 0;
+                pointer-events: none;
+                transition: all 0.3s ease;
+                z-index: 1999;
+            }
+
+            .navbar-links.active {
+                transform: translateY(0);
+                opacity: 1;
+                pointer-events: all;
+            }
+
+            .search-container {
+                width: 100%;
+                margin: 1rem 0;
+            }
+
+            .search-input {
+                width: 100%;
+            }
+
+            /* Animación del menú hamburguesa */
+            .menu-toggle.active span:nth-child(1) {
+                transform: rotate(45deg) translate(5px, 5px);
+            }
+
+            .menu-toggle.active span:nth-child(2) {
+                opacity: 0;
+            }
+
+            .menu-toggle.active span:nth-child(3) {
+                transform: rotate(-45deg) translate(7px, -6px);
+            }
+        }
+
+        /* Estilos para el lightbox de videos */
+        .video-lightbox {
+            display: none;
+            position: fixed;
+            z-index: 2001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .video-lightbox-content {
+            max-width: 90%;
+            max-height: 90vh;
+            width: auto;
+            height: auto;
+        }
+
+        .video-lightbox video {
+            max-width: 100%;
+            max-height: 90vh;
+            width: auto;
+            height: auto;
+        }
+
+        .video-item {
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .video-item:hover {
+            transform: scale(1.05);
+        }
+
+        .video-close {
+            position: absolute;
+            top: 15px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 2002;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="navbar-content">
+            <a href="index.html" class="navbar-brand">
+                <i class="fas fa-photo-video"></i>
+                Full xxx
+            </a>
+            <div class="menu-toggle" id="menuToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <div class="navbar-links" id="navbarLinks">
+                <a href="index.html">Inicio</a>
+                <a href="tetonas.html">Tetonas</a>
+                <a href="vagina.html">Vagina</a>
+                <a href="anime.html">Anime</a>
+                <div class="search-container">
+                    <input type="text" class="search-input" placeholder="Buscar...">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>Tetonas</h1>
+        <div class="gallery-container" id="gallery">
+            <!-- Las imágenes se cargarán aquí automáticamente -->
+        </div>
+
+        <h1>Videos</h1>
+        <div class="video-container" id="videoGallery">
+            <!-- Los videos se cargarán aquí automáticamente -->
+        </div>
+    </div>
+
+    <div class="lightbox" id="lightbox">
+        <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
+        <div class="lightbox-nav lightbox-prev" onclick="changeImage(-1)">&#10094;</div>
+        <img class="lightbox-content" id="lightbox-img">
+        <div class="lightbox-nav lightbox-next" onclick="changeImage(1)">&#10095;</div>
+    </div>
+
+    <div class="video-lightbox" id="videoLightbox">
+        <span class="video-close" onclick="closeVideoLightbox()">&times;</span>
+        <div class="video-lightbox-content" id="videoLightboxContent">
+            <!-- El video se insertará aquí -->
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2023 Anime Gallery. Todos los derechos reservados.</p>
+    </footer>
+
+    <script>
+        let currentImageIndex = 0;
+        let galleryImages = [];
+
+        function loadMedia() {
+            const gallery = document.getElementById('gallery');
+            const videoGallery = document.getElementById('videoGallery');
+            
+            // Cargar imágenes
+            fetch('img/tetonas/')
+                .then(response => response.text())
+                .then(data => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(data, 'text/html');
+                    galleryImages = Array.from(doc.querySelectorAll('a'))
+                        .map(a => a.href)
+                        .filter(href => href.match(/\.(jpg|jpeg|png|gif|webp)$/i));
+                    
+                    galleryImages.sort();
+                    galleryImages.forEach((file, index) => createGalleryItem(file, index));
+                });
+
+            // Cargar videos
+            fetch('vid/tetonas/')
+                .then(response => response.text())
+                .then(data => {
+                    videoGallery.innerHTML = '';
+                    
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(data, 'text/html');
+                    const videoFiles = Array.from(doc.querySelectorAll('a'))
+                        .map(a => a.href)
+                        .filter(href => href.match(/\.(mp4|webm)$/i));
+                    
+                    const uniqueVideos = [...new Set(videoFiles)];
+                    
+                    uniqueVideos.sort();
+                    uniqueVideos.forEach(file => createVideoItem(file));
+                });
+        }
+
+        function createGalleryItem(imagePath, index) {
+            const div = document.createElement('div');
+            div.className = 'gallery-item';
+            div.onclick = function() { openLightbox(index); };
+            
+            const img = document.createElement('img');
+            img.src = imagePath;
+            img.alt = 'Imagen de galería';
+            
+            div.appendChild(img);
+            gallery.appendChild(div);
+        }
+
+        function createVideoItem(videoPath) {
+            const div = document.createElement('div');
+            div.className = 'video-item';
+            
+            const video = document.createElement('video');
+            video.src = videoPath;
+            video.controls = true;
+            video.preload = 'metadata';
+            
+            div.onclick = function() {
+                openVideoLightbox(videoPath);
+            };
+            
+            div.appendChild(video);
+            videoGallery.appendChild(div);
+        }
+
+        function openLightbox(index) {
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImg = document.getElementById('lightbox-img');
+            currentImageIndex = index;
+            lightboxImg.src = galleryImages[currentImageIndex];
+            lightbox.style.display = 'flex';
+            document.addEventListener('keydown', handleKeyPress);
+        }
+
+        function closeLightbox() {
+            const lightbox = document.getElementById('lightbox');
+            lightbox.style.display = 'none';
+            document.removeEventListener('keydown', handleKeyPress);
+        }
+
+        function changeImage(direction) {
+            currentImageIndex = (currentImageIndex + direction + galleryImages.length) % galleryImages.length;
+            const lightboxImg = document.getElementById('lightbox-img');
+            lightboxImg.src = galleryImages[currentImageIndex];
+        }
+
+        function handleKeyPress(e) {
+            switch(e.key) {
+                case 'ArrowLeft':
+                    changeImage(-1);
+                    break;
+                case 'ArrowRight':
+                    changeImage(1);
+                    break;
+                case 'Escape':
+                    closeLightbox();
+                    break;
+            }
+        }
+
+        function openVideoLightbox(videoPath) {
+            const videoLightbox = document.getElementById('videoLightbox');
+            const videoContent = document.getElementById('videoLightboxContent');
+            
+            const video = document.createElement('video');
+            video.src = videoPath;
+            video.controls = true;
+            video.autoplay = true;
+            
+            videoContent.innerHTML = '';
+            videoContent.appendChild(video);
+            
+            videoLightbox.style.display = 'flex';
+            document.addEventListener('keydown', handleVideoKeyPress);
+        }
+
+        function closeVideoLightbox() {
+            const videoLightbox = document.getElementById('videoLightbox');
+            const videoContent = document.getElementById('videoLightboxContent');
+            
+            const video = videoContent.querySelector('video');
+            if (video) {
+                video.pause();
+            }
+            
+            videoLightbox.style.display = 'none';
+            document.removeEventListener('keydown', handleVideoKeyPress);
+        }
+
+        function handleVideoKeyPress(e) {
+            if (e.key === 'Escape') {
+                closeVideoLightbox();
+            }
+        }
+
+        // Inicializar todo
+        document.addEventListener('DOMContentLoaded', () => {
+            loadMedia();
+            
+            document.getElementById('videoLightbox').addEventListener('click', (e) => {
+                if (e.target.id === 'videoLightbox') {
+                    closeVideoLightbox();
+                }
+            });
+        });
+
+        // Funcionalidad del menú móvil
+        const menuToggle = document.getElementById('menuToggle');
+        const navbarLinks = document.getElementById('navbarLinks');
+        
+        menuToggle.addEventListener('click', () => {
+            menuToggle.classList.toggle('active');
+            navbarLinks.classList.toggle('active');
+        });
+
+        // Cerrar menú al hacer clic en un enlace
+        document.querySelectorAll('.navbar-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                menuToggle.classList.remove('active');
+                navbarLinks.classList.remove('active');
+            });
+        });
+    </script>
+</body>
+</html> 
